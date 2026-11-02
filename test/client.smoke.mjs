@@ -161,7 +161,7 @@ if (!styleEl.textContent.includes('#root')) throw new Error('style missing #root
 if (!styleEl.textContent.includes('body.dsh-lg-on [data-composer-card]::before')) throw new Error('card frosted pseudo rule must be gated by body.dsh-lg-on');
 if (!styleEl.textContent.includes('body.dsh-lg-on [data-composer-card] button[class*="_primary"]')) throw new Error('send-button lens rule must be gated by body.dsh-lg-on');
 if (!styleEl.textContent.includes('body.dsh-lg-on [data-queue-dock] > div')) throw new Error('queue-dock frosted rule must be gated by body.dsh-lg-on');
-if (!styleEl.textContent.includes('body.dsh-lg-on [data-conversation-scroll] [class*="_bubble"]::before')) throw new Error('bubble frosted pseudo rule must be gated by body.dsh-lg-on');
+if (!styleEl.textContent.includes('body.dsh-lg-on [data-conversation-scroll] [class*="_bubble"]:not([class^="_bubble_"])::before')) throw new Error('bubble frosted pseudo rule must be gated by body.dsh-lg-on');
 if (!styleEl.textContent.includes('[data-composer-card]::before')) throw new Error('style missing composer-card frosted pseudo rule');
 if (!styleEl.textContent.includes('button[class*="_primary"]')) throw new Error('style missing send-button lens rule');
 if (!styleEl.textContent.includes('[data-queue-dock] > div')) throw new Error('style missing queue-dock frosted rule');
@@ -175,8 +175,12 @@ if (!pseudoRule.includes('backdrop-filter')) throw new Error('card frost must ri
 if (!pseudoRule.includes('inset 0 1px 0')) throw new Error('card top rim must be a thin 1px line, not a wide band');
 // the bubble anchor is dual (harness <=0.1.x: [data-time-hover-root];
 // harness >=0.2: [data-conversation-scroll]) — assert BOTH arms survived
-if (!styleEl.textContent.includes('[data-time-hover-root] [class*="_bubble"]::before')) throw new Error('style missing the legacy bubble frosted pseudo rule');
-if (!styleEl.textContent.includes('[data-conversation-scroll] [class*="_bubble"]::before')) throw new Error('style missing the harness>=0.2 bubble frosted pseudo rule');
+if (!styleEl.textContent.includes('[data-time-hover-root] [class*="_bubble"]:not([class^="_bubble_"])::before')) throw new Error('style missing the legacy bubble frosted pseudo rule');
+if (!styleEl.textContent.includes('[data-conversation-scroll] [class*="_bubble"]:not([class^="_bubble_"])::before')) throw new Error('style missing the harness>=0.2 bubble frosted pseudo rule');
+// the substring match must not catch the harness Tooltip bubble (web shell
+// CSS module class pattern _bubble_<hash>_<n>, position:fixed): relative +
+// isolation reflow host rows and misanchor viewport-coordinate offsets
+if (!styleEl.textContent.includes('[class*="_bubble"]:not([class^="_bubble_"])')) throw new Error('bubble rules must exclude the harness tooltip class pattern');
 // settings modal: frosted + same lens rim as the composer card, on the pseudo only
 if (!styleEl.textContent.includes('[role="dialog"][aria-labelledby]::before')) throw new Error('style missing settings-dialog frosted pseudo rule');
 const dialogBase = styleEl.textContent.match(/\[role="dialog"\]\[aria-labelledby\]\s*\{[^}]*\}/)?.[0] ?? '';
